@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ];
 
     if (isset($consumo[$vehiculo]) && $distancia > 0) {
-        $galones = round($distancia / $consumo[$vehiculo], 3);
+        $galones = round($distancia / $consumo[$vehiculo], 2);
         $mensaje = "El $vehiculo recorrerá $distancia Km de distancia consumiendo $galones Galones.";
     } else {
         $mensaje = "Por favor ingrese una distancia válida y seleccione un vehículo.";
