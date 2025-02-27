@@ -1,64 +1,71 @@
 <?php
-// Definir las unidades de medida
-$unidades = array(
-  'metro' => array('metro' => 1, 'pulgada' => 39.3701, 'yarda' => 1.09361, 'pie' => 3.28084),
-  'pulgada' => array('metro' => 0.0254, 'pulgada' => 1, 'yarda' => 0.0000833333, 'pie' => 0.0833333),
-  'yarda' => array('metro' => 0.9144, 'pulgada' => 36, 'yarda' => 1, 'pie' => 3),
-  'pie' => array('metro' => 0.3048, 'pulgada' => 12, 'yarda' => 0.333333, 'pie' => 1)
-);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $cantidad = isset($_POST["cantidad"]) ? floatval($_POST["cantidad"]) : 0;
+    $unidad = isset($_POST["unidad"]) ? $_POST["unidad"] : "metros";
+    
+    // Factores de conversión
+    $conversiones = [
+        "metros" => ["pulgadas" => 39.3701, "yardas" => 1.09361, "pies" => 3.28084],
+        "pulgadas" => ["metros" => 0.0254, "yardas" => 0.0277778, "pies" => 0.0833333],
+        "yardas" => ["metros" => 0.9144, "pulgadas" => 36, "pies" => 3],
+        "pies" => ["metros" => 0.3048, "pulgadas" => 12, "yardas" => 0.333333]
+    ];
+    
+    $resultados = [];
+    if (isset($conversiones[$unidad])) {
+        foreach ($conversiones[$unidad] as $key => $factor) {
+            $resultados[$key] = $cantidad * $factor;
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conversor de Longitudes</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Longitudes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
-<body>
-  <div class="container">
-    <h1>Conversor de Longitudes</h1>
-    <form action="#" method="post">
-      <div class="form-group">
-        <label for="unidad">Unidad de medida:</label>
-        <select id="unidad" name="unidad" class="form-control">
-          <option value="metro">Metro</option>
-          <option value="pulgada">Pulgada</option>
-          <option value="yarda">Yarda</option>
-          <option value="pie">Pie</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="cantidad">Cantidad:</label>
-        <input type="number" id="cantidad" name="cantidad" class="form-control" step="0.00001">
-      </div>
-      <button type="submit" class="btn btn-primary">Convertir</button>
+<body class="container mt-5">
+    <h2 class="text-center">Conversor de Longitudes</h2>
+    <form method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="cantidad" class="form-label">Cantidad:</label>
+            <input type="number" step="any" class="form-control" name="cantidad" required>
+        </div>
+        <div class="mb-3">
+            <label for="unidad" class="form-label">Selecciona la unidad:</label>
+            <select class="form-select" name="unidad" required>
+                <option value="metros">Metros</option>
+                <option value="pulgadas">Pulgadas</option>
+                <option value="yardas">Yardas</option>
+                <option value="pies">Pies</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Convertir</button>
     </form>
-    <?php if (isset($_POST['unidad']) && isset($_POST['cantidad'])): ?>
-      <h2>Resultados:</h2>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Unidad</th>
-            <th>Resultado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($unidades[$_POST['unidad']] as $unidad => $factor): ?>
-            <tr>
-              <td><?php echo $unidad; ?></td>
-              <td><?php echo $_POST['cantidad'] * $factor; ?></td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+    
+    <?php if (!empty($resultados)): ?>
+        <h3 class="mt-4">Resultados:</h3>
+        <p><strong><?php echo $cantidad . ' ' . ucfirst($unidad); ?></strong> equivale a:</p>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Unidad</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($resultados as $unidad => $valor): ?>
+                    <tr>
+                        <td><?php echo ucfirst($unidad); ?></td>
+                        <td><?php echo number_format($valor, 4); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     <?php endif; ?>
-  </div>
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </body>
-
 </html>
